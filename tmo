@@ -1,0 +1,15 @@
+[connection]
+id=tmo
+uuid=66da80ea-4ea4-4072-a546-b321fd8dbc9c
+type=gsm
+autoconnect=false
+
+[gsm]
+number=*99#
+apn=epc.tmobile.com
+
+[ipv4]
+method=auto
+
+[serial]
+baud=115200
