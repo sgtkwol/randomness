@@ -1,0 +1,22 @@
+Conflicts:
+        Android.mk
+        src/java/com/android/internal/telephony/BaseCommands.java
+        src/java/com/android/internal/telephony/CallManager.java
+        src/java/com/android/internal/telephony/CommandsInterface.java
+        src/java/com/android/internal/telephony/ISms.aidl
+        src/java/com/android/internal/telephony/IccSmsInterfaceManager.java
+        src/java/com/android/internal/telephony/IccSmsInterfaceManagerProxy.java
+        src/java/com/android/internal/telephony/PhoneFactory.java
+        src/java/com/android/internal/telephony/RIL.java
+        src/java/com/android/internal/telephony/SMSDispatcher.java
+        src/java/com/android/internal/telephony/ServiceStateTracker.java
+        src/java/com/android/internal/telephony/cat/CatService.java
+        src/java/com/android/internal/telephony/cat/ValueParser.java
+        src/java/com/android/internal/telephony/cdma/CdmaConnection.java
+        src/java/com/android/internal/telephony/cdma/CdmaLteServiceStateTracker.java
+        src/java/com/android/internal/telephony/cdma/CdmaServiceStateTracker.java
+        src/java/com/android/internal/telephony/dataconnection/DcTracker.java
+        src/java/com/android/internal/telephony/dataconnection/DcTrackerBase.java
+        src/java/com/android/internal/telephony/gsm/GSMPhone.java
+        src/java/com/android/internal/telephony/sip/SipCommandInterface.java
+        src/java/com/android/internal/telephony/test/SimulatedCommands.java
