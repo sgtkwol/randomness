@@ -1,5 +1,3 @@
-@echo "off
-:batch
 dsfile=rom.3ds
 makemode=1
 GameName=rom
@@ -8,302 +6,178 @@ qmanual=0
 qrsf=0
 goto next
 
-:next
-if ! [ -f tools/ goto notools
-if ! [ -f decrypted/exefs.bin goto start
-if ! [ -f decrypted/exheader.bin goto start
-if ! [ -f decrypted/romfs.bin goto start
-if ! [ -f exefs/banner.bin goto start
-if ! [ -f exefs/code.bin goto start
-if $makemodeequ 1 goto start2
-if $makemodeequ 2 goto creatersf
-
-:start2
-cls
-echo.
-echo "You already have existing decrypted files.
-echo.
-/P start2="Are you trying to repack them?  ( y / n )"
-if /I "%start2%"=="n" goto warning
-if /I "%start2%"=="y" goto creatersf
-echo ""Select either y or n." & goto start2
-
-:warning
-cls
-echo.
-echo "Reference code 5: Folders located before decryption.
-echo "Kindly delete the folders if you want to decrypt a new game!
-if $makemodeequ 2 echo "v.Express
-echo.
-pause
-goto end
-
-:start
-if ! [ -f rom.3ds goto norom
-if ! [ -f *exefs_norm.xorpad goto noxorpad
-if ! [ -f *exheader.xorpad goto noxorpad
-if ! [ -f *main.romfs.xorpad goto noxorpad
-goto decrypt
-
-:decrypt
-mv *.exheader.xorpad exh.xorpad
-mv *main.romfs.xorpad romfs.xorpad
-
-if [ -f *UpdateData.romfs.xorpad del *UpdateData.romfs.xorpad
-
-if ! [ -f *exefs_7x.xorpad ren *Main.exefs_norm.xorpad exefs.xorpad
-if [ -f *exefs_7x.xorpad ren *Main.exefs_7x.xorpad exefs_7x.xorpad
-if [ -f exefs_7x.xorpad ren *Main.exefs_norm.xorpad exefs_norm.xorpad
-
-
-tools/ctrtool -p --exefs=exefs.bin $dsfile%
-echo.
-echo "Will take a while here.
-echo.
-tools/ctrtool -p --romfs=romfs.bin $dsfile%
-tools/ctrtool -p --exheader=exheader.bin $dsfile%
-
-if [ -f exefs_7x.xorpad tools/MEX.py exefs.bin exefs_norm.xorpad exefs_7x.xorpad exefs.xorpad
-
-mkdir xorpads
-mkdir encrypted_bin
-mkdir decrypted
-tools/padxorer.exe exefs.bin exefs.xorpad
-tools/padxorer.exe exheader.bin exh.xorpad
-tools/padxorer.exe romfs.bin romfs.xorpad
-if [ -f exefs_7x.xorpad mv exefs_7x.xorpad xorpads/exefs_7x.xorpad
-if [ -f exefs_norm.xorpad mv exefs_norm.xorpad xorpads/exefs_norm.xorpad
-mv exefs.xorpad xorpads/exefs.xorpad
-mv exh.xorpad xorpads/exh.xorpad
-mv romfs.xorpad xorpads/romfs.xorpad
-mv exheader.bin encrypted_bin/exheader.bin
-mv decrypted_exheader.bin decrypted/exheader.bin
-tools/ctrtool --exefsdir=exefs --decompresscode -t exefs decrypted_exefs.bin
-if $makemodeequ 1 goto wait1
-if $makemodeequ 2 goto nounpack
-
-:wait1
-cls
-/P wait1="Want to slowly unpack romfs.bin fully?  ( n / y )"
-if /I "%wait1%"=="y" goto yesunpack
-if /I "%wait1%"=="n" goto nounpack
-echo ""It's either y or n !!" & goto wait1
-
-:yesunpack
-tools/ctrtool --romfsdir=romfs decrypted_romfs.bin
-mv romfs decrypted/romfs
-goto nounpack
-
-:nounpack
-mv exefs.bin encrypted_bin/exefs.bin
-mv romfs.bin encrypted_bin/romfs.bin
-mv decrypted_exefs.bin decrypted/exefs.bin
-mv decrypted_romfs.bin decrypted/romfs.bin
-tools/ctrtool -t exheader decrypted/exheader.bin > exheaderinfo.txt
-goto check
-
-:check
-if ! [ -f decrypted/exefs.bin goto decryptfailed
-if ! [ -f decrypted/romfs.bin goto decryptfailed
-if ! [ -f decrypted/exheader.bin goto decryptfailed
-if ! [ -f exefs/banner.bin goto decryptfailed
-if ! [ -f exefs/code.bin goto decryptfailed
-echo. 
-echo "Decryption successful!
-echo.
-goto creatersf
-
-:creatersf
-if [ -f rom.rsf del rom.rsf
-copy tools/rom.rsf rom.rsf
-copy decrypted/exheader.bin exheader.bin
-cls
-if $makemodeequ 1 goto region
-if $makemodeequ 2 goto yesr
-
-:region
-cls
-echo.
-echo "Do you want to remv region lock?
-echo.
-/P region="( y / n )"
-if /I "%region%"=="n" goto nor
-if /I "%region%"=="y" goto yesr
-echo ""Choose y or n." & goto region
-
-:yesr
-tools/rsfgen.py rom true
+if ! [ -f tools/ ]; then
+echo "Reference code 4: Tools folder not found."
+echo "Ensure tools are named as they were provided,"
+echo "and to be located as they were provided."
+echo "If this error still shows, re-extract the .rar package."
+fi
+if [ ! -f decrypted/exefs.bin ] || [ ! -f decrypted/exheader.bin ] || [ ! -f decrypted/romfs.bin ] || [ ! -f exefs/banner.bin ] || [ ! -f exefs/code.bin]; then
+echo "You already have existing decrypted files."
+read -p "Are you trying to repack them?  ( y / n )" start2
+  if [ start2=n ]; then
+  echo "Reference code 5: Folders located before decryption."
+  echo "Kindly delete the folders if you want to decrypt a new game!"
+  read -p "Press [Enter] to exit."
+  exit
+  else
+    if [ ! -f rom.3ds ]; then
+    echo "Reference code 2: rom.3ds not located."
+    echo "Kindly place rom.3ds here and try again later!"
+    read -p "Press [Enter] to exit."
+    exit
+    if [ ! -f *exefs_norm.xorpad ] || [ ! -f *exheader.xorpad ] || [ ! -f *main.romfs.xorpad ]; then
+    echo "Reference code 3: xorpad not located.
+    echo "Ensure they are named as per tutorial.
+    read -p "Press [Enter] to exit."
+    exit
+    fi
+    mv *.exheader.xorpad exh.xorpad
+    mv *main.romfs.xorpad romfs.xorpad
+  fi
+  rm *UpdateData.romfs.xorpad
+  mv *Main.exefs_norm.xorpad exefs.xorpad
+  mv *Main.exefs_7x.xorpad exefs_7x.xorpad
+  mv *Main.exefs_norm.xorpad exefs_norm.xorpad
+  wine tools/ctrtool.exe -p --exefs=exefs.bin $dsfile
+  echo "Will take a while here."
+  wine tools/ctrtool.exe -p --romfs=romfs.bin $dsfile
+  wine tools/ctrtool.exe -p --exheader=exheader.bin $dsfile
+  if [ -f exefs_7x.xorpad ]; then
+  tools/MEX.py exefs.bin exefs_norm.xorpad exefs_7x.xorpad exefs.xorpad
+  fi
+  mkdir xorpads
+  mkdir encrypted_bin
+  mkdir decrypted
+  wine tools/padxorer.exe exefs.bin exefs.xorpad
+  wine tools/padxorer.exe exheader.bin exh.xorpad
+  wine tools/padxorer.exe romfs.bin romfs.xorpad
+  mv exefs_7x.xorpad xorpads/exefs_7x.xorpad
+  mv exefs_norm.xorpad xorpads/exefs_norm.xorpad
+  mv exefs.xorpad xorpads/exefs.xorpad
+  mv exh.xorpad xorpads/exh.xorpad
+  mv romfs.xorpad xorpads/romfs.xorpad
+  mv exheader.bin encrypted_bin/exheader.bin
+  mv decrypted_exheader.bin decrypted/exheader.bin
+  wine tools/ctrtool.exe --exefsdir=exefs --decompresscode -t exefs decrypted_exefs.bin
+  read -p "Want to slowly unpack romfs.bin fully?  ( n / y )" wait1
+  if [ wait1=y ]; then
+  wine tools/ctrtool..exe --romfsdir=romfs decrypted_romfs.bin
+  mv romfs decrypted/romfs
+  fi
+  mv exefs.bin encrypted_bin/exefs.bin
+  mv romfs.bin encrypted_bin/romfs.bin
+  mv decrypted_exefs.bin decrypted/exefs.bin
+  mv decrypted_romfs.bin decrypted/romfs.bin
+  wine tools/ctrtool.exe -t exheader decrypted/exheader.bin > exheaderinfo.txt
+  if [ ! -f decrypted/exefs.bin ] || [ ! -f decrypted/romfs.bin ] || [ ! -f decrypted/exheader.bin ] || [ ! -f exefs/banner.bin ] || [ ! -f exefs/code.bin ]; then
+  echo "Reference code 1: Required .bins not located."
+  echo "Decryption may have failed."
+  read -p "Press [Enter] to exit."
+  exit
+  else
+  echo "Decryption successful!
+  fi
+fi
+rm rom.rsf
+cp tools/rom.rsf rom.rsf
+cp decrypted/exheader.bin exheader.bin
+read -p "Do you want to remv region lock? ( y / n )" region
+if [ region=y ]; then
+python tools/rsfgen.py rom true
 qregion=1
-goto regiondone
-
-:nor
+else
 tools/rsfgen.py rom false
-goto regiondone
-
-:regiondone
-del exheader.bin
-cls
-echo.
-echo "Don't worry, I'm still working here!
-echo.
-if [ -f *Manual.romfs.xorpad (tools/rom_tool --extract=. rom.3ds) else if [ -f *DownloadPlay.romfs.xorpad (tools/rom_tool --extract=. rom.3ds)
-if [ -f *Manual.romfs.xorpad ren *manual*.cfa manual.cfa
-if [ -f *Manual.romfs.xorpad ren xorpads/Manual.romfs.xorpad
-if [ -f *DownloadPlay.romfs.xorpad ren xorpads/DownloadPlay.romfs.xorpad
-if [ -f *DownloadPlay.romfs.xorpad ren *DLP.cfa dlp.cfa
-
-del *appdata.cxi
-del *updatedata.cfa
-goto build
-
-:build
-if $makemodeequ 2 goto continue
-if [ -f manual.cfa goto manualchoice
-goto ownrsf
-
-:manualchoice
-cls
-echo.
-echo "Do you want to include the user manual?
-echo.
-/P manualchoice="( y / n )"
-if /I "%manualchoice%"=="n" goto nom
-if /I "%manualchoice%"=="y" goto yesm
-echo ""Come on! It's either y or n!" & goto manualchoice
-
-:yesm
-qmanual=1
-goto ownrsf
-
-:nom
-del manual.cfa
-goto ownrsf
-
-:ownrsf
-cls
-echo.
-echo "Do you want to use your own .rsf file?
-echo.
-/P ownrsf="( y / n )"
-if /I "%ownrsf%"=="n" goto norsf
-if /I "%ownrsf%"=="y" goto yesrsf
-echo ""Come on! It's either y or n!" & goto ownrsf
-
-:yesrsf
-cls
-if [ -f rom.rsf ren rom2.rsf
-echo.
-echo "Kindly place your own rom.rsf file NOW in /Step 2
-echo "Once ready, press enter.
-echo.
-pause
-if [ -f rom.rsf qrsf=1 & goto continue
-if ! [ -f rom.rsf goto ownrsf
-goto continue
-
-:norsf
-if [ -f rom2.rsf (if [ -f rom.rsf del rom.rsf)
-if [ -f rom2.rsf ren rom.rsf
-goto continue
-
-:continue
-cls
-echo.
-echo "It'll take a while.
-echo "Don't panic when you see "warning".
-echo "However if it says "not enough memory",
-echo "Then I would recommend for you to restart in safe mode and try again.
-echo "But don't panic just yet.
-echo "A blank makerom may open. Leave it be.
-echo.
-
-tools/makerom -f cxi -o rom.cxi -target t -desc app:5 -rsf rom.rsf -icon exefs/icon.bin -banner exefs/banner.bin -exefslogo -code exefs/code.bin -exheader decrypted/exheader.bin -romfs decrypted/romfs.bin
-
-tools/exinjector -rom rom.cxi -exheader decrypted/exheader.bin -sd -fwspoof
-echo.
+fi
+rm exheader.bin
+echo "Don't worry, I'm still working here!"
+if [ -f *Manual.romfs.xorpad ]; then
+wine tools/rom_tool.exe --extract=. rom.3ds
+elif [ -f *DownloadPlay.romfs.xorpad ]; then
+tools/rom_tool --extract=. rom.3ds
+fi
+mv *manual*.cfa manual.cfa
+mv xorpads/Manual.romfs.xorpad
+mv xorpads/DownloadPlay.romfs.xorpad
+mv *DLP.cfa dlp.cfa
+mv *appdata.cxi
+mv *updatedata.cfa
+if [ -f manual.cfa ]; then
+read "Do you want to include the user manual? ( y / n )" manualchoice
+  if [ manualchoice=n ]
+  rm manual.cfa
+  else
+  qmanual=1
+  fi
+fi
+read "Do you want to use your own .rsf file? ( y / n )" ownrsf
+if [ ownrsf=y ]; then
+echo "Kindly place your own rom.rsf file NOW in /Step 2"
+read -p "Once ready, press [Enter].
+else
+  if [ -f rom2.rsf ]; then
+  rm rom.rsf
+  fi
+mv rom2.rsf rom.rsf
+fi
+echo "It'll take a while."
+echo "Don't panic when you see "warning"."
+echo "However if it says "not enough memory","
+echo "Then I would recommend for you to restart in safe mode and try again."
+echo "But don't panic just yet."
+echo "A blank makerom may open. Leave it be."
+wine tools/makerom.exe -f cxi -o rom.cxi -target t -desc app:5 -rsf rom.rsf -icon exefs/icon.bin -banner exefs/banner.bin -exefslogo -code exefs/code.bin -exheader decrypted/exheader.bin -romfs decrypted/romfs.bin
+wine tools/exinjector.exe -rom rom.cxi -exheader decrypted/exheader.bin -sd -fwspoof
 echo "Close Exinjector Prompt
-echo.
 
-if [ -f "manual.cfa" (if [ -f dlp.cfa (tools/makerom -f cia -o rom.cia -content rom.cxi:0:0 -content manual.cfa:1:1 -content dlp.cfa:2:2) else (tools/makerom -f cia -o rom.cia -content rom.cxi:0:0 -content manual.cfa:1:1)) & goto result
-if [ -f "dlp.cfa" tools/makerom -f cia -content rom.cxi:0:0 -o rom.cia -content dlp.cfa:2:2 & goto result
+if [ -f "manual.cfa" ]; then
+  if [ -f dlp.cfa ]; then
+  tools/makerom -f cia -o rom.cia -content rom.cxi:0:0 -content manual.cfa:1:1 -content dlp.cfa:2:2
+  else
+  wine tools/makerom.exe -f cia -o rom.cia -content rom.cxi:0:0 -content manual.cfa:1:1
+fi
+if [ -f  dlp.cfa ]; then
+tools/makerom -f cia -content rom.cxi:0:0 -o rom.cia -content dlp.cfa:2:2
+fi
 tools/makerom -f cia -content rom.cxi:0:0 -o rom.cia
-goto Result
+rm install2.cia
+install.cia install2.cia
+rm rom.cxi
 
-:Result
-if [ -f install2.cia del install2.cia
-if [ -f install.cia ren install2.cia
-if [ -f rom.cxi del rom.cxi
-if [ -f rom.cia (ren rom.cia install.cia)
-if [ -f *manual.romfs.xorpad (ren *Manual.romfs.xorpad manual.romfs.xorpad)
-if [ -f *DownloadPlay.romfs.xorpad (ren *DownloadPlay.romfs.xorpad DownloadPlay.romfs.xorpad)
-if [ -f manual.romfs.xorpad (mv manual.romfs.xorpad xorpads/manual.romfs.xorpad)
-if [ -f downloadplay.romfs.xorpad (mv downloadplay.romfs.xorpad xorpads/downloadplay.romfs.xorpad)
-if [ -f rom.rsf del rom.rsf
-if [ -f appdata.cxi del appdata.cxi
-if [ -f manual.cfa del manual.cfa
-if [ -f rom2.rsf del rom2.rsf
-if [ -f *manual.cfa mv *manual.cfa manual.cfa
-if [ -f manual.cfa del manual.cfa
-if [ -f rom.cci del rom.cci
-if [ -f exheaderinfo.txt del exheaderinfo.txt
-cls
-color c
-echo.
-if [ -f "install.cia" echo "[*] CIA conversion completed!
-if [ -f "install.cia" (if $qregionequ 1 (echo "[*] Region Free Enabled))
-if [ -f "install.cia" (if $qmanualequ 1 (echo "[*] Manual Added))
-if [ -f "install.cia" (if [ -f "dlp.cfa" (echo "[*] Download Play Added))
-if [ -f "install.cia" (if $qrsfequ 1 (echo "[*] User RSF Added))
-if [ -f "install.cia" echo "[*] You may close the program now!
-if ! [ -f "install.cia" echo "[!] An error has occured.
-if ! [ -f "install.cia" echo "[!] Close the program, and restart the process.
-echo.
-if [ -f dlp.cfa del dlp.cfa
-if [ -f *dlp.cfa ren *dlp.cfa dlp.cfa
-if [ -f dlp.cfa del dlp.cfa
-pause
-goto end
-
-:decryptfailed
-cls
-echo.
-echo "Reference code 1: Required .bins not located.
-echo "Decryption may have failed. 
-if $makemodeequ 2 echo "v.Express
-echo.
-pause
-goto end
-
-:norom
-cls
-echo.
-echo "Reference code 2: rom.3ds not located.
-echo "Kindly place rom.3ds here and try again later!
-if $makemodeequ 2 echo "v.Express
-echo.
-pause
-goto end
-
-:noxorpad
-cls
-echo.
-echo "Reference code 3: xorpad not located.
-echo "Ensure they are named as per tutorial.
-if $makemodeequ 2 echo "v.Express
-echo.
-pause
-goto end
-
-:notools
-cls
-echo.
-echo "Reference code 4: Tools folder not found.
-echo "Ensure tools are named as they were provided,
-echo "and to be located as they were provided.
-echo "If this error still shows, re-extract the .rar package.
-if $makemodeequ 2 echo "v.Express
-echo.
-pause
-goto end
-
-:end
+mv rom.cia install.cia
+mv *Manual.romfs.xorpad manual.romfs.xorpad
+mv *DownloadPlay.romfs.xorpad DownloadPlay.romfs.xorpad
+mv manual.romfs.xorpad xorpads/manual.romfs.xorpad
+mv downloadplay.romfs.xorpad xorpads/downloadplay.romfs.xorpad
+rm rom.rsf
+rm appdata.cxi
+rm  manual.cfa
+rm rom2.rsf
+rm  *manual.cfa manual.cfa
+rm manual.cfa
+rm rom.cci
+rm exheaderinfo.txt
+if [ -f "install.cia" ]; then
+echo "[*] CIA conversion completed!"
+  if [ $qregionequ=1 ]; then
+  echo "[*] Region Free Enabled"
+  fi
+  if [ $qmanualequ=1 ]; then
+  echo "[*] Manual Added"
+  fi
+  if [ -f dlp.cfa ]; then
+  echo "[*] Download Play Added"
+  fi
+  if [ $qrsfequ=1 ]; then
+  echo "[*] User RSF Added"
+  fi
+  echo "[*] You may close the program now!"
+  read -p "Press [Enter] key to exit"
+  exit
+else
+echo "[!] An error has occured."
+echo "[!] Close the program, and restart the process."
+fi
+rm dlp.cfa
+mv *dlp.cfa dlp.cfa
+rm dlp.cfa
