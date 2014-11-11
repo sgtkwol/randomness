@@ -178,6 +178,4 @@ else
 echo "[!] An error has occured."
 echo "[!] Close the program, and restart the process."
 fi
-rm dlp.cfa
-mv *dlp.cfa dlp.cfa
-rm dlp.cfa
+rm *dlp.cfa
