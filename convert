@@ -4,97 +4,96 @@ GameName=rom
 qregion=0
 qmanual=0
 qrsf=0
-goto next
 
 if ! [ -f tools/ ]; then
-echo "Reference code 4: Tools folder not found."
-echo "Ensure tools are named as they were provided,"
-echo "and to be located as they were provided."
-echo "If this error still shows, re-extract the .rar package."
+   echo "Reference code 4: Tools folder not found."
+   echo "Ensure tools are named as they were provided,"
+   echo "and to be located as they were provided."
+   echo "If this error still shows, re-extract the .rar package."
 fi
 if [ ! -f decrypted/exefs.bin ] || [ ! -f decrypted/exheader.bin ] || [ ! -f decrypted/romfs.bin ] || [ ! -f exefs/banner.bin ] || [ ! -f exefs/code.bin]; then
-echo "You already have existing decrypted files."
-read -p "Are you trying to repack them?  ( y / n )" start2
-  if [ start2=n ]; then
-  echo "Reference code 5: Folders located before decryption."
-  echo "Kindly delete the folders if you want to decrypt a new game!"
-  read -p "Press [Enter] to exit."
-  exit
-  else
-    if [ ! -f rom.3ds ]; then
-    echo "Reference code 2: rom.3ds not located."
-    echo "Kindly place rom.3ds here and try again later!"
-    read -p "Press [Enter] to exit."
-    exit
-    if [ ! -f *exefs_norm.xorpad ] || [ ! -f *exheader.xorpad ] || [ ! -f *main.romfs.xorpad ]; then
-    echo "Reference code 3: xorpad not located.
-    echo "Ensure they are named as per tutorial.
-    read -p "Press [Enter] to exit."
-    exit
-    fi
-    mv *.exheader.xorpad exh.xorpad
-    mv *main.romfs.xorpad romfs.xorpad
-  fi
-  rm *UpdateData.romfs.xorpad
-  mv *Main.exefs_norm.xorpad exefs.xorpad
-  mv *Main.exefs_7x.xorpad exefs_7x.xorpad
-  mv *Main.exefs_norm.xorpad exefs_norm.xorpad
-  wine tools/ctrtool.exe -p --exefs=exefs.bin $dsfile
-  echo "Will take a while here."
-  wine tools/ctrtool.exe -p --romfs=romfs.bin $dsfile
-  wine tools/ctrtool.exe -p --exheader=exheader.bin $dsfile
-  if [ -f exefs_7x.xorpad ]; then
-  tools/MEX.py exefs.bin exefs_norm.xorpad exefs_7x.xorpad exefs.xorpad
-  fi
-  mkdir xorpads
-  mkdir encrypted_bin
-  mkdir decrypted
-  wine tools/padxorer.exe exefs.bin exefs.xorpad
-  wine tools/padxorer.exe exheader.bin exh.xorpad
-  wine tools/padxorer.exe romfs.bin romfs.xorpad
-  mv exefs_7x.xorpad xorpads/exefs_7x.xorpad
-  mv exefs_norm.xorpad xorpads/exefs_norm.xorpad
-  mv exefs.xorpad xorpads/exefs.xorpad
-  mv exh.xorpad xorpads/exh.xorpad
-  mv romfs.xorpad xorpads/romfs.xorpad
-  mv exheader.bin encrypted_bin/exheader.bin
-  mv decrypted_exheader.bin decrypted/exheader.bin
-  wine tools/ctrtool.exe --exefsdir=exefs --decompresscode -t exefs decrypted_exefs.bin
-  read -p "Want to slowly unpack romfs.bin fully?  ( n / y )" wait1
-  if [ wait1=y ]; then
-  wine tools/ctrtool..exe --romfsdir=romfs decrypted_romfs.bin
-  mv romfs decrypted/romfs
-  fi
-  mv exefs.bin encrypted_bin/exefs.bin
-  mv romfs.bin encrypted_bin/romfs.bin
-  mv decrypted_exefs.bin decrypted/exefs.bin
-  mv decrypted_romfs.bin decrypted/romfs.bin
-  wine tools/ctrtool.exe -t exheader decrypted/exheader.bin > exheaderinfo.txt
-  if [ ! -f decrypted/exefs.bin ] || [ ! -f decrypted/romfs.bin ] || [ ! -f decrypted/exheader.bin ] || [ ! -f exefs/banner.bin ] || [ ! -f exefs/code.bin ]; then
-  echo "Reference code 1: Required .bins not located."
-  echo "Decryption may have failed."
-  read -p "Press [Enter] to exit."
-  exit
-  else
-  echo "Decryption successful!
-  fi
+   echo "You already have existing decrypted files."
+   read -p "Are you trying to repack them?  ( y / n )" start2
+   if [ start2=n ]; then
+     echo "Reference code 5: Folders located before decryption."
+     echo "Kindly delete the folders if you want to decrypt a new game!"
+     read -p "Press [Enter] to exit."
+     exit
+   fi
+   if [ ! -f rom.3ds ]; then
+      echo "Reference code 2: rom.3ds not located."
+      echo "Kindly place rom.3ds here and try again later!"
+      read -p "Press [Enter] to exit."
+      exit
+   fi
+   if [ ! -f *exefs_norm.xorpad ] || [ ! -f *exheader.xorpad ] || [ ! -f *main.romfs.xorpad ]; then
+      echo "Reference code 3: xorpad not located.
+      echo "Ensure they are named as per tutorial.
+      read -p "Press [Enter] to exit."
+      exit
+   fi
+   mv *.exheader.xorpad exh.xorpad
+   mv *main.romfs.xorpad romfs.xorpad
+   rm *UpdateData.romfs.xorpad
+   mv *Main.exefs_norm.xorpad exefs.xorpad
+   mv *Main.exefs_7x.xorpad exefs_7x.xorpad
+   mv *Main.exefs_norm.xorpad exefs_norm.xorpad
+   wine tools/ctrtool.exe -p --exefs=exefs.bin $dsfile
+   echo "Will take a while here."
+   wine tools/ctrtool.exe -p --romfs=romfs.bin $dsfile
+   wine tools/ctrtool.exe -p --exheader=exheader.bin $dsfile
+   if [ -f exefs_7x.xorpad ]; then
+     tools/MEX.py exefs.bin exefs_norm.xorpad exefs_7x.xorpad exefs.xorpad
+   fi
+   mkdir xorpads
+   mkdir encrypted_bin
+   mkdir decrypted
+   wine tools/padxorer.exe exefs.bin exefs.xorpad
+   wine tools/padxorer.exe exheader.bin exh.xorpad
+   wine tools/padxorer.exe romfs.bin romfs.xorpad
+   mv exefs_7x.xorpad xorpads/exefs_7x.xorpad
+   mv exefs_norm.xorpad xorpads/exefs_norm.xorpad
+   mv exefs.xorpad xorpads/exefs.xorpad
+   mv exh.xorpad xorpads/exh.xorpad
+   mv romfs.xorpad xorpads/romfs.xorpad
+   mv exheader.bin encrypted_bin/exheader.bin
+   mv decrypted_exheader.bin decrypted/exheader.bin
+   wine tools/ctrtool.exe --exefsdir=exefs --decompresscode -t exefs decrypted_exefs.bin
+   read -p "Want to slowly unpack romfs.bin fully?  ( n / y )" wait1
+   if [ wait1=y ]; then
+     wine tools/ctrtool..exe --romfsdir=romfs decrypted_romfs.bin
+     mv romfs decrypted/romfs
+   fi
+   mv exefs.bin encrypted_bin/exefs.bin
+   mv romfs.bin encrypted_bin/romfs.bin
+   mv decrypted_exefs.bin decrypted/exefs.bin
+   mv decrypted_romfs.bin decrypted/romfs.bin
+   wine tools/ctrtool.exe -t exheader decrypted/exheader.bin > exheaderinfo.txt
+   if [ ! -f decrypted/exefs.bin ] || [ ! -f decrypted/romfs.bin ] || [ ! -f decrypted/exheader.bin ] || [ ! -f exefs/banner.bin ] || [ ! -f exefs/code.bin ]; then
+     echo "Reference code 1: Required .bins not located."
+     echo "Decryption may have failed."
+     read -p "Press [Enter] to exit."
+     exit
+   else
+     echo "Decryption successful!
+   fi
 fi
 rm rom.rsf
 cp tools/rom.rsf rom.rsf
 cp decrypted/exheader.bin exheader.bin
 read -p "Do you want to remv region lock? ( y / n )" region
 if [ region=y ]; then
-python tools/rsfgen.py rom true
-qregion=1
+   python tools/rsfgen.py rom true
+   qregion=1
 else
-tools/rsfgen.py rom false
+   tools/rsfgen.py rom false
 fi
 rm exheader.bin
 echo "Don't worry, I'm still working here!"
 if [ -f *Manual.romfs.xorpad ]; then
-wine tools/rom_tool.exe --extract=. rom.3ds
+   wine tools/rom_tool.exe --extract=. rom.3ds
 elif [ -f *DownloadPlay.romfs.xorpad ]; then
-tools/rom_tool --extract=. rom.3ds
+   tools/rom_tool --extract=. rom.3ds
 fi
 mv *manual*.cfa manual.cfa
 mv xorpads/Manual.romfs.xorpad
@@ -103,22 +102,22 @@ mv *DLP.cfa dlp.cfa
 mv *appdata.cxi
 mv *updatedata.cfa
 if [ -f manual.cfa ]; then
-read "Do you want to include the user manual? ( y / n )" manualchoice
-  if [ manualchoice=n ]
-  rm manual.cfa
-  else
-  qmanual=1
-  fi
+   read "Do you want to include the user manual? ( y / n )" manualchoice
+   if [ manualchoice=n ]
+     rm manual.cfa
+   else
+     qmanual=1
+   fi
 fi
 read "Do you want to use your own .rsf file? ( y / n )" ownrsf
 if [ ownrsf=y ]; then
-echo "Kindly place your own rom.rsf file NOW in /Step 2"
-read -p "Once ready, press [Enter].
+   echo "Kindly place your own rom.rsf file NOW in /Step 2"
+   read -p "Once ready, press [Enter].
 else
-  if [ -f rom2.rsf ]; then
-  rm rom.rsf
-  fi
-mv rom2.rsf rom.rsf
+   if [ -f rom2.rsf ]; then
+      rm rom.rsf
+   fi
+   mv rom2.rsf rom.rsf
 fi
 echo "It'll take a while."
 echo "Don't panic when you see "warning"."
@@ -131,13 +130,14 @@ wine tools/exinjector.exe -rom rom.cxi -exheader decrypted/exheader.bin -sd -fws
 echo "Close Exinjector Prompt
 
 if [ -f "manual.cfa" ]; then
-  if [ -f dlp.cfa ]; then
-  tools/makerom -f cia -o rom.cia -content rom.cxi:0:0 -content manual.cfa:1:1 -content dlp.cfa:2:2
-  else
-  wine tools/makerom.exe -f cia -o rom.cia -content rom.cxi:0:0 -content manual.cfa:1:1
+   if [ -f dlp.cfa ]; then
+     tools/makerom -f cia -o rom.cia -content rom.cxi:0:0 -content manual.cfa:1:1 -content dlp.cfa:2:2
+   else
+     wine tools/makerom.exe -f cia -o rom.cia -content rom.cxi:0:0 -content manual.cfa:1:1
+   fi
 fi
 if [ -f  dlp.cfa ]; then
-tools/makerom -f cia -content rom.cxi:0:0 -o rom.cia -content dlp.cfa:2:2
+   tools/makerom -f cia -content rom.cxi:0:0 -o rom.cia -content dlp.cfa:2:2
 fi
 tools/makerom -f cia -content rom.cxi:0:0 -o rom.cia
 rm install2.cia
@@ -158,24 +158,24 @@ rm manual.cfa
 rm rom.cci
 rm exheaderinfo.txt
 if [ -f "install.cia" ]; then
-echo "[*] CIA conversion completed!"
-  if [ $qregionequ=1 ]; then
-  echo "[*] Region Free Enabled"
-  fi
-  if [ $qmanualequ=1 ]; then
-  echo "[*] Manual Added"
-  fi
-  if [ -f dlp.cfa ]; then
-  echo "[*] Download Play Added"
-  fi
-  if [ $qrsfequ=1 ]; then
-  echo "[*] User RSF Added"
-  fi
-  echo "[*] You may close the program now!"
-  read -p "Press [Enter] key to exit"
-  exit
+   echo "[*] CIA conversion completed!"
+   if [ $qregionequ=1 ]; then
+     echo "[*] Region Free Enabled"
+   fi
+   if [ $qmanualequ=1 ]; then
+     echo "[*] Manual Added"
+   fi
+   if [ -f dlp.cfa ]; then
+     echo "[*] Download Play Added"
+   fi
+   if [ $qrsfequ=1 ]; then
+     echo "[*] User RSF Added"
+   fi
+    echo "[*] You may close the program now!"
+    read -p "Press [Enter] key to exit"
+    exit
 else
-echo "[!] An error has occured."
-echo "[!] Close the program, and restart the process."
+   echo "[!] An error has occured."
+   echo "[!] Close the program, and restart the process."
 fi
 rm *dlp.cfa
